@@ -1,5 +1,7 @@
 # woof!bot
 
+an interactive stream chatbot by [slugbubby](https://twitch.tv/slugbubby)
+
 ## planned features
 
 - woofbot
@@ -9,7 +11,13 @@
 
 ## TODO
 
-- get a domain
-- set up database schema
+**october 3, 2026**
+
+- finish up setting up boilerplate-i just wanna stop talking to claude outside my ide
 
 ## tech stack
+
+- hono server
+- postgres db
+- drizzle orm
+- railway hosting
