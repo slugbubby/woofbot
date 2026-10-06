@@ -1,0 +1,50 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>woofbot overlay</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        background: transparent;
+        color: white;
+        font-family: sans-serif;
+      }
+      #debugLog {
+        display: none;
+        padding: 8px;
+        font-size: 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="debugLog"></div>
+    <script>
+      const debug = new URLSearchParams(location.search).has("debug");
+      const debugLog = document.getElementById("debugLog");
+      if (debug) debugLog.style.display = "block";
+
+      function debugNote(msg) {
+        if (!debug) return;
+        const line = document.createElement("div");
+        line.textContent = `${new Date().toLocaleTimeString()} ${msg}`;
+        debugLog.prepend(line);
+      }
+
+      const events = new EventSource("/overlay/events");
+      events.addEventListener("open", () => debugNote("connected"));
+      events.addEventListener("error", () =>
+        debugNote("disconnected, retrying…"),
+      );
+
+      events.addEventListener("woof", (e) => {
+        const { user } = JSON.parse(e.data);
+        debugNote(`woof${user ? ` from ${user}` : ""}`);
+        new Audio("/sounds/denji.mp3")
+          .play()
+          .catch((err) => debugNote(`play failed: ${err.message}`));
+      });
+    </script>
+  </body>
+</html>
