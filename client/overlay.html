@@ -11,39 +11,50 @@
         color: white;
         font-family: sans-serif;
       }
+      #debugLogTitle {
+        display: none;
+      }
       #debugLog {
         display: none;
-        padding: 8px;
-        font-size: 14px;
+        font-size: 24px;
+        max-width: 300px;
       }
     </style>
   </head>
+
   <body>
+    <h1 id="debugLogTitle">DEBUG LOG</h1>
     <div id="debugLog"></div>
+
     <script>
-      const debug = new URLSearchParams(location.search).has("debug");
+      const isDebug = new URLSearchParams(location.search).has("debug");
       const debugLog = document.getElementById("debugLog");
-      if (debug) debugLog.style.display = "block";
+      if (isDebug) {
+        debugLog.style.display = "block";
+        document.getElementById("debugLogTitle").style.display = "block";
+      }
 
       function debugNote(msg) {
-        if (!debug) return;
+        if (!isDebug) {
+          return;
+        }
         const line = document.createElement("div");
         line.textContent = `${new Date().toLocaleTimeString()} ${msg}`;
         debugLog.prepend(line);
       }
 
       const events = new EventSource("/overlay/events");
-      events.addEventListener("open", () => debugNote("connected"));
-      events.addEventListener("error", () =>
-        debugNote("disconnected, retrying…"),
-      );
+      events.addEventListener("open", () => debugNote("Connected"));
+      events.addEventListener("error", () => {
+        debugNote("Disconnected, retrying…");
+      });
 
       events.addEventListener("woof", (e) => {
-        const { user } = JSON.parse(e.data);
-        debugNote(`woof${user ? ` from ${user}` : ""}`);
-        new Audio("/sounds/denji.mp3")
+        const { user, sound } = JSON.parse(e.data);
+        debugNote(`${user} woof`);
+        new Audio(`/sounds/${encodeURIComponent(sound)}.mp3`)
           .play()
-          .catch((err) => debugNote(`play failed: ${err.message}`));
+          .catch((err) => debugNote(`Woof failed: ${err.message}`));
       });
     </script>
   </body>

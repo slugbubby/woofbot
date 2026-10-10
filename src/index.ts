@@ -4,8 +4,10 @@ import { sql } from "drizzle-orm";
 import { Hono } from "hono";
 
 import { db } from "./db/index.js";
-import { overlayRoutes } from "./overlay/routes.js";
 import { devRoutes } from "./dev/routes.js";
+import { overlayRoutes } from "./overlay/routes.js";
+import { connectToTwitchChat } from "./twitch/client.js";
+import { twitchAuthRoutes } from "./twitch/routes.js";
 
 const app = new Hono();
 
@@ -26,9 +28,15 @@ app.route("/overlay", overlayRoutes);
 
 app.use("/sounds/*", serveStatic({ root: "./public" }));
 
+app.route("/auth/twitch", twitchAuthRoutes);
+
 const port = Number(process.env.PORT || 6969);
 serve({ fetch: app.fetch, port }, (info) => {
-  console.log(`listening on http://localhost:${info.port}`);
+  console.log(`Listening on http://localhost:${info.port}`);
 });
+
+connectToTwitchChat().catch((err) =>
+  console.error("Failed to connect to Twitch chat", err),
+);
 
 export default app;

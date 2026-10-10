@@ -3,6 +3,7 @@ import { EventEmitter } from "node:events";
 export type OverlayEvent = {
   type: "woof"; // Can expand to 'meow' etc later
   user?: string;
+  sound?: string;
 };
 
 const bus = new EventEmitter();
