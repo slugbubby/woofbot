@@ -1,6 +1,5 @@
 import { ApiClient } from "@twurple/api";
-import type { AccessToken } from "@twurple/auth";
-import { RefreshingAuthProvider } from "@twurple/auth";
+import { RefreshingAuthProvider, type AccessToken } from "@twurple/auth";
 import { EventSubWsListener } from "@twurple/eventsub-ws";
 import { desc } from "drizzle-orm";
 
