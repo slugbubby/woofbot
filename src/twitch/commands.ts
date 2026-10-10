@@ -33,11 +33,9 @@ export async function handleChatMessage(
   }
 }
 
-function resolveSoundName(name?: string | null): string {
+function resolveSoundName(name?: string): string | null {
   const normalized = name?.toLowerCase();
-  return normalized && soundFilenames.has(normalized)
-    ? normalized
-    : DEFAULT_SOUND;
+  return normalized && soundFilenames.has(normalized) ? normalized : null;
 }
 
 async function woof(
@@ -47,16 +45,24 @@ async function woof(
   const now = Date.now();
   const userLastWoofAt = lastWoofByUser.get(event.chatterId) ?? 0;
 
-  if (now - lastWoofAt < GLOBAL_COOLDOWN_MS) {
+  if (
+    now - lastWoofAt < GLOBAL_COOLDOWN_MS &&
+    event.chatterName.toLowerCase() !== "slugbubby"
+  ) {
     return;
   }
-  if (now - userLastWoofAt < USER_COOLDOWN_MS) {
+  if (
+    now - userLastWoofAt < USER_COOLDOWN_MS &&
+    event.chatterName.toLowerCase() !== "slugbubby"
+  ) {
     return;
   }
 
   lastWoofAt = now;
   lastWoofByUser.set(event.chatterId, now);
 
-  const sound = resolveSoundName(arg);
+  const customSound =
+    resolveSoundName(event.chatterName.toLowerCase()) || resolveSoundName(arg);
+  const sound = customSound || DEFAULT_SOUND;
   emitOverlayEvent({ type: "woof", user: event.chatterDisplayName, sound });
 }
